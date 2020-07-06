@@ -1,15 +1,14 @@
 import {  Column,  Entity,  Index,  JoinColumn,  ManyToOne,  PrimaryGeneratedColumn} from 'typeorm';
-import { permission } from '../entities/permission';
-import { rol } from '../entities/rol';
+import { permission } from './permission';
+import { rol } from './rol';
 
 @Index('permission_rol_pkey', ['id'], { unique: true })
-@Entity('permission_rol', { schema: "public" })
-
+@Entity('permission_rol')
 export class permission_rol {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
   
-  @Column('character varying', { nullable: true, length: 255, default: 'active' })
+  @Column('varchar', { nullable: true, length: 255, default: 'active' })
   state: string | null;
 
   @ManyToOne(() => permission, permission => permission.permissionRoles,{ onUpdate: 'CASCADE' },)

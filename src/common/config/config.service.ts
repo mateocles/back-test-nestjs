@@ -10,7 +10,7 @@ export class ConfigService {
   private readonly filePath = `.env`;
   private readonly isProduction;
   private readonly isDevelopment;
-  
+
   constructor() {
     this.envConfig = !existsSync(this.filePath)
       ? process.env
@@ -37,10 +37,10 @@ export class ConfigService {
     return process.env.NODE_ENV || 'local';
   }
 
- // get sendgrid(): any {
+  // get sendgrid(): any {
   //  return {
-    //  apiKey: this.envConfig.SENDGRID_API_KEY,
-   // };
+  //  apiKey: this.envConfig.SENDGRID_API_KEY,
+  // };
   //}
 
   get jwt(): string {
@@ -59,9 +59,7 @@ export class ConfigService {
       logging: true,
       ssl: this.isProduction || this.isDevelopment,
       entities: [
-        this.isProduction || this.isDevelopment
-          ? 'src/entities/*.ts'
-          : 'dist/entities/*.js',
+        this.isProduction || this.isDevelopment ? 'src/entities/*.ts' : 'dist/entities/*.js',
       ],
     };
   }
