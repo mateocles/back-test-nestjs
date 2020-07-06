@@ -12,8 +12,6 @@ export class person {
   @Column("varchar", { nullable: true, length: 255 })
   lastname: string | null;
 
-  @OneToOne(() => user, user => user.person, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'RESTRICT' })
-
-  @JoinColumn({ name: 'fk_user' })
-  user: user | null;
+  @OneToOne(() => user, user => user.person)
+  user: user;
 }

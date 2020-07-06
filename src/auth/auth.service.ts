@@ -14,27 +14,22 @@ export class AuthService {
     @Inject('CryptoService') private readonly cryptoService,
     private readonly jwtService: JwtService,
     @InjectRepository(user) private readonly userRepository: Repository<user>,
-    @InjectRepository(person)
-    private readonly personRepository: Repository<person>,
+    @InjectRepository(person) private readonly personRepository: Repository<person>,
     private readonly userService: UserService,
   ) { }
 
   async getStructureToken(email) {
-    return await this.personRepository
-      .createQueryBuilder()
+    return await this.personRepository.createQueryBuilder()
       .select([
         'person.name',
-        'person.lastname',
-        'person.document',
-        'person.phone',
-        'person.gender',
+        'person.lastname'
       ])
       .addSelect(['user.id', 'user.email', 'user.state'])
       .innerJoin('person.user', 'user')
-      .where(
-        "person.state = 'active' and user.state = 'active' and user.email = :email",
-        { email },
-      )
+      .leftJoinAndSelect('user.roles','roles')
+      .leftJoinAndSelect('roles.permissionRols','permissionRols')
+      .leftJoinAndSelect('permissionRols.permission','permission')
+      .where("user.state = 'active' and user.email = :email",{ email }, )
       .getOne();
   }
 
@@ -56,34 +51,24 @@ export class AuthService {
   }
 
   async signUp(body: SignUpDto) {
+    console.log(body)
     body.password = this.cryptoService.encrypt(body.password);
 
     const validateUser = await this.userRepository.findOne({
       where: { email: body.email, state: 'active' },
     });
-    const validatePerson = await this.personRepository.findOne({
-      where: { document: body.document, state: 'active' },
-    });
 
-    if (validateUser) {
-      return {
-        error: 'EMAIL_IN_USE',
-        detail: 'Ese correo electronico ya está siendo utilizado.',
-      };
-    } else if (validatePerson) {
-      return {
-        error: 'IDENTIFICATION_CARD_IN_USE',
-        detail: 'La cédula de ciudadanía ya está siendo utilizada.',
-      };
-    } else {
-      try {
-        const person = await this.personRepository.save(body);
-        await this.userRepository.save({ ...body, person: { id: person.id } });
+    if (validateUser)
+      return { error: 'EMAIL_IN_USE', detail: 'Ese correo electronico ya está siendo utilizado.' };
 
-        return { success: 'OK' };
-      } catch (error) {
-        return { error };
-      }
+    try {
+      const person = await this.personRepository.save({ name: body.name, lastname: body.lastname });
+
+      await this.userRepository.save({ email: body.email, password: body.password, person: { id: person.id } });
+
+      return { success: 'OK' };
+    } catch (error) {
+      return { error };
     }
   }
 

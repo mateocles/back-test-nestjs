@@ -14,7 +14,7 @@ export class user {
     @Column("varchar", {select: false,nullable: false,length: 200})
     password: string;
 
-    @Column("varchar", {nullable: false,length: 10})
+    @Column("varchar", {nullable: false, length: 10, default:'active'})
     state: string;
 
     @CreateDateColumn({ type: "timestamp" })

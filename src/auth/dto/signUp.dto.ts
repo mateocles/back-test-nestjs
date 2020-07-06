@@ -5,11 +5,6 @@ import { ApiProperty } from '@nestjs/swagger';
 export class SignUpDto {
   @ApiProperty()
   @IsString()
-  @Length(10, 11)
-  document: string;
-
-  @ApiProperty()
-  @IsString()
   @Length(2, 50)
   name: string;
 

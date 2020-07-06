@@ -21,6 +21,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'El usuario ya se encuentra registrado.' })
   async signUp(@Body() body: SignUpDto) {
     const response = await this.authService.signUp(body);  
+    
     if (response.error) return { response };
     return response;
   }
