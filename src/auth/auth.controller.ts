@@ -39,9 +39,5 @@ export class AuthController {
 
     return { success: 'OK', payload: this.jwtService.sign({ ...response }) };
   }
-
-  @Post('validate-token')
-  async validateToken(@Query('token') token: string) {
-    return await this.authService.validateUser(token);
-  }  
+ 
 }
