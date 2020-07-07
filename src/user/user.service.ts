@@ -12,10 +12,12 @@ export class UserService {
   ) { }
 
   async getPermissions(id: number) {
-    const user = await this.userRepository.find({
-      relations: ['roles', 'roles.permissionRoles', 'roles.permissionRoles.permission'],
-      where: { user: { id }, state: 'active' }
-    });
+    const user = await this.userRepository.createQueryBuilder("user")
+      .innerJoinAndSelect("user.roles", "roles")
+      .innerJoinAndSelect("roles.permissionRoles", "permissionRoles")
+      .innerJoinAndSelect("permissionRoles.permission", "permission")
+      .where("user.id= :id AND user.state='active' ", { id: id })
+      .getMany();
 
     if (!user)
       return { error: 'USER_NOT_EXIST', detail: 'Usuario no existe o se encuentra inactivo.' };
