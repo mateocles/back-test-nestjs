@@ -7,15 +7,16 @@ import { user } from '../entities/user';
 import { person } from '../entities/person';
 import { UserService } from '../user/user.service';
 import { HttpStrategy } from '../common/strategy/http.strategy';
-import { permission } from '../entities/permission';
+import { role } from '../entities/role';
+
 
 @Module({
   imports: [
     JwtModule.register({
-      secret: 'inbianam',
+      secret: 'mateo',
       signOptions: { expiresIn: '15d' },
     }),
-    TypeOrmModule.forFeature([user, person]),
+    TypeOrmModule.forFeature([user, person,role]),
   ],
   controllers: [AuthController],
   providers: [AuthService, HttpStrategy, UserService],

@@ -7,6 +7,8 @@ import { LoginDto } from './dto/login.dto';
 import { person } from '../entities/person';
 import { SignUpDto } from './dto/signUp.dto';
 import { UserService } from '../user/user.service';
+import { role } from '../entities/role';
+import { PUBLIC } from '../common/constanst/rol';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +17,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(user) private readonly userRepository: Repository<user>,
     @InjectRepository(person) private readonly personRepository: Repository<person>,
+    @InjectRepository(role) private readonly roleRepository: Repository<role>,
     private readonly userService: UserService,
   ) { }
 
@@ -26,10 +29,7 @@ export class AuthService {
       ])
       .addSelect(['user.id', 'user.email', 'user.state'])
       .innerJoin('person.user', 'user')
-      .leftJoinAndSelect('user.roles','roles')
-      .leftJoinAndSelect('roles.permissionRols','permissionRols')
-      .leftJoinAndSelect('permissionRols.permission','permission')
-      .where("user.state = 'active' and user.email = :email",{ email }, )
+      .where("user.state = 'active' and user.email = :email", { email },)
       .getOne();
   }
 
@@ -51,9 +51,7 @@ export class AuthService {
   }
 
   async signUp(body: SignUpDto) {
-    console.log(body)
     body.password = this.cryptoService.encrypt(body.password);
-
     const validateUser = await this.userRepository.findOne({
       where: { email: body.email, state: 'active' },
     });
@@ -63,8 +61,13 @@ export class AuthService {
 
     try {
       const person = await this.personRepository.save({ name: body.name, lastname: body.lastname });
-
-      await this.userRepository.save({ email: body.email, password: body.password, person: { id: person.id } });
+      const user = await this.userRepository.save({ email: body.email, password: body.password, person: { id: person.id } });
+      
+      const rol = await this.roleRepository.save({
+        name: PUBLIC.name,
+        key: PUBLIC.key,
+        user: { id: user.id }
+      })
 
       return { success: 'OK' };
     } catch (error) {
@@ -81,9 +84,9 @@ export class AuthService {
         where: { email: payload.user.email }
       })
 
-      //const permissions = await this.userService.getPermissions(user.id);
+      const permissions = await this.userService.getPermissions(user.id);
 
-      return { ...user };
+      return { ...user, ...permissions };
     }
 
     return false;

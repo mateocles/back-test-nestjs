@@ -1,10 +1,10 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, } from 'typeorm';
-import { permission_rol } from './permission_rol';
+import { permission_role } from './permission_role';
 import { user } from './user';
 
 @Index('rol_pkey', ['id'], { unique: true })
-@Entity('rol')
-export class rol {
+@Entity('role')
+export class role {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
@@ -20,8 +20,8 @@ export class rol {
   @Column('varchar', { nullable: true, length: 1000 })
   description: string | null;
 
-  @OneToMany(() => permission_rol, permission_rol => permission_rol.rol)
-  permissionRols: permission_rol[];
+  @OneToMany(() => permission_role,permission_role => permission_role.role)
+  permissionRoles: permission_role[];
 
   @ManyToOne(() => user, user => user.roles, { onUpdate: 'CASCADE' },)
   @JoinColumn([{ name: 'fk_user', referencedColumnName: 'id' }])

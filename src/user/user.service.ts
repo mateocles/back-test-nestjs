@@ -16,24 +16,25 @@ export class UserService {
       relations: ['roles', 'roles.permissionRoles', 'roles.permissionRoles.permission'],
       where: { user: { id }, state: 'active' }
     });
+
     if (!user)
       return { error: 'USER_NOT_EXIST', detail: 'Usuario no existe o se encuentra inactivo.' };
+
     const roles = [];
     const permissions = [];
-    user.map(item => {
-     /* item.roles.map(item2 => {
-        roles.push(item2.key);
-        item2.permissionRol.map(item3 => {
-          permissions.push(item3.permission.key);
-        });
-      });*/
+    await user.map(item => {
+      item.roles.map(item2 => {
+        roles.push(item2.key)
+        item2.permissionRoles.map(item3 => {
+          permissions.push(item3.permission.key)
+        })
+      })
     });
     return { roles, permissions }
   }
 
-  async getUsers(){
+  async getUsers() {
     return await this.userRepository.find({})
-
   }
 
 
