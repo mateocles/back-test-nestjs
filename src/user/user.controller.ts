@@ -5,7 +5,7 @@ import { UserService } from './user.service';
 import { Roles } from '../common/decorators/roles.decorator';
 import { PermissionsGuard } from '../common/guards/permission.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
-import { ADMIN } from '../common/constanst/rol'
+import { ADMIN, PUBLIC } from '../common/constanst/rol'
 
 @ApiTags("Usuario")
 @Controller('user')
@@ -17,9 +17,16 @@ constructor(private readonly userService:UserService){}
 @ApiCreatedResponse({ description: 'OK' })
 @ApiForbiddenResponse({ description: 'FORBIDDEN' })
 @UseGuards(AuthGuard('bearer'), PermissionsGuard, RolesGuard)
-@Roles(ADMIN.key)
+@Roles(PUBLIC.key)
 async getAllUser() {
   return await this.userService.getUsers()
 }
+
+@Get('/get/all')
+@ApiOperation({ summary: 'Obtener usuarios registrados' })
+async getAll() {
+  return await this.userService.getUsers()
+}
+
 
 }
